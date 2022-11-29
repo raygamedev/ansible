@@ -1,5 +1,0 @@
-- name: Load gitlab credentials
-  hosts: localhost
-  gather_facts: true
-  roles:
-    - zsh
