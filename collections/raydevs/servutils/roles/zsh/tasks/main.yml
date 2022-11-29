@@ -1,0 +1,37 @@
+---
+# tasks file for servutils/roles/zsh
+- stat:
+    path: "{{ ansible_env.HOME }}/.oh-my-zsh"
+  register: existing_zsh
+
+- get_url:
+    url:  https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+    dest: /tmp/install.sh
+  register: download_zsh_res
+  delegate_to: localhost
+
+- block:
+    - name: Install Zsh
+      apt:
+        pkg:
+          - zsh
+          - git
+      become: true
+
+    - script: "{{ download_zsh_res.dest }} --unattended"
+    - user:
+        name: "{{ user }}"
+        shell: "{{ shell_dst }}"
+      become: true
+
+    - lineinfile:
+        path: "{{ zshrc_path }}"
+        line: "{{ item }}"
+      with_items: "{{ zshrc_lines }}"
+  rescue:
+    - name: Remove oh-my-zsh
+      file:
+        path: "{{ ansible_env.HOME }}/.oh-my-zsh"
+        state: absent
+      become: true
+  when: not existing_zsh.stat.exists

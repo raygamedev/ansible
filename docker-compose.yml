@@ -1,0 +1,10 @@
+version: "3"
+services:
+  ansible:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/raygamedev/ansible:latest
+    volumes:
+      - ./:/root/
+      - /var/run/docker.sock:/var/run/docker.sock
